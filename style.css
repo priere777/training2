@@ -1,0 +1,191 @@
+/* 全体のリセットと基本設定 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px 10px;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* コンテナ (サイト全体を囲む箱) のスタイル */
+.container {
+    background-color: #ffffff;
+    padding: 30px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 500px;
+}
+
+/* タイトルのスタイル */
+h1 {
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 25px;
+    font-size: 1.6em;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+h2 {
+    color: #28a745;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+/* 入力セクションのレイアウト */
+.input-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* ラベル (項目名) のスタイル */
+.input-section label {
+    font-weight: 600;
+    flex-basis: 50%;
+    font-size: 0.95em;
+}
+
+/* 入力フィールドのスタイル */
+input[type="number"] {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    flex-basis: 40%;
+    text-align: right;
+    font-size: 0.9em;
+}
+
+/* ドロップダウン (select) のスタイル */
+select {
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    flex-basis: 100%;
+    font-size: 0.9em;
+}
+
+/* ドロップダウンの親コンテナの調整 */
+.input-section > div {
+    display: flex;
+    align-items: center;
+    flex-basis: 45%; 
+    justify-content: flex-end;
+}
+
+/* ボタンのスタイル */
+#calculateBtn {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+#calculateBtn:hover {
+    background-color: #0056b3;
+}
+
+/* 結果表示エリアのスタイル */
+#result {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #e9f7ef;
+    border: 1px solid #d4edda;
+    border-radius: 6px;
+    line-height: 1.4;
+    font-size: 0.95em;
+}
+
+/* 区切り線のスタイル */
+hr {
+    border: 0;
+    height: 1px;
+    background-color: #dee2e6;
+    margin: 25px 0;
+}
+
+/* テーブルのスタイル */
+#monthlyInterestTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.85em;
+}
+
+#monthlyInterestTable th, #monthlyInterestTable td {
+    border: 1px solid #ddd;
+    padding: 6px;
+    text-align: right;
+}
+
+#monthlyInterestTable th {
+    background-color: #f8f9fa;
+    text-align: center;
+    color: #495057;
+}
+
+#monthlyInterestTable tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* 途中の区切り線 */
+.separator td {
+    text-align: center !important;
+    background-color: #fff;
+    font-style: italic;
+    padding: 5px 0;
+    border: none !important;
+}
+
+/* ★モバイル対応（項目名のフォントサイズを調整） */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    .container {
+        padding: 20px 15px;
+        max-width: 100%;
+    }
+    
+    /* 入力セクションは横並びを維持 */
+    .input-section {
+        flex-direction: row; 
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    /* ラベル (項目名) のフォントサイズを小さくし、1行に収める */
+    .input-section label {
+        flex-basis: 40%; 
+        margin-bottom: 0;
+        margin-right: 5px;
+        font-size: 0.8em; /* ★修正: フォントサイズを小さく調整 */
+    }
+    
+    input[type="number"],
+    .input-section > div {
+        flex-basis: 55%; 
+        width: auto;
+    }
+    
+    /* タイトルとヘッダーの調整 */
+    h1 {
+        font-size: 1.4em;
+    }
+    h2 {
+        font-size: 1.2em;
+    }
+}
