@@ -1,151 +1,210 @@
-document.getElementById('calculateBtn').addEventListener('click', function() {
-    // 1. ユーザーからの入力値を取得
-    const initialAmount = parseFloat(document.getElementById('initialAmount').value) || 0;
-    const monthlyContribution = parseFloat(document.getElementById('monthlyContribution').value) || 0;
-    const annualRate = parseFloat(document.getElementById('annualRate').value) / 100;
-    const years = parseInt(document.getElementById('years').value) || 0;
-    
-    // ★修正：ドロップダウンから選択された税率を取得
-    const taxRateString = document.getElementById('taxRateType').value;
-    const TAX_RATE = parseFloat(taxRateString);
+// ====================================
+// 診断データ: 質問と選択肢
+// ====================================
 
-    if (initialAmount < 0 || monthlyContribution < 0 || annualRate < 0 || years <= 0) {
-        document.getElementById('result').innerHTML = '<p style="color: red;">入力値に誤りがあります。正の数を入力してください。</p>';
+const questions = [
+    // 軸 1：E軸 (Energy Source) - エネルギーの源 (R/P)
+    { q: 1, text: "週末にストレスをリセットするなら？", axis: 'E', options: [{ text: "誰にも邪魔されない場所で、自分の世界に没頭する。", score: 'R' }, { text: "友人や知人と会い、おしゃべりやアクティビティを楽しむ。", score: 'P' }] },
+    { q: 2, text: "長期プロジェクトのアイデアを考えるとき、まず何から始めますか？", axis: 'E', options: [{ text: "必要な情報を集めた後、静かに一人で深く思考を巡らせる。", score: 'R' }, { text: "チームやパートナーとすぐに話し合い、意見を出し合いながら進める。", score: 'P' }] },
+    { q: 3, text: "人から相談を受けるとき、あなたの態度は？", axis: 'E', options: [{ text: "相手の話をじっくり聞き、共感しつつも、心の中で冷静に分析する。", score: 'R' }, { text: "積極的に質問を返し、具体的な解決策を提案しながら議論をリードする。", score: 'P' }] },
+    { q: 4, text: "自分が「活き活きしている」と感じるのは、どんな時ですか？", axis: 'E', options: [{ text: "自分の興味を深く掘り下げ、新しい知識やスキルを獲得している時。", score: 'R' }, { text: "多くの人の中心で活動し、外部から刺激や承認を得ている時。", score: 'P' }] },
+    
+    // 軸 2：F軸 (Focus Style) - 集中力のスタイル (S/M)
+    { q: 5, text: "目の前の作業に集中している時、メールや通知が来たら？", axis: 'F', options: [{ text: "通知をオフにし、一つのタスクが完了するまで無視する。", score: 'S' }, { text: "気分転換も兼ねて、すぐにチェックし、簡単なものはサッと返信する。", score: 'M' }] },
+    { q: 6, text: "新しい分野を学ぶとき、あなたの方法は？", axis: 'F', options: [{ text: "まず基礎を徹底的に固め、完璧に理解してから応用に進む。", score: 'S' }, { text: "複数の関連分野に同時に手を出し、それらのつながりを見つけようとする。", score: 'M' }] },
+    { q: 7, text: "料理をするとき、あなたのスタイルは？", axis: 'F', options: [{ text: "レシピ通りに一つ一つの工程を丁寧に、確実に行う。", score: 'S' }, { text: "複数のメニューを同時に作り、調味料の調整は味見しながら臨機応変に行う。", score: 'M' }] },
+    { q: 8, text: "複雑な問題に直面したとき、どのように考えますか？", axis: 'F', options: [{ text: "全体を無視して、問題の**核心となる一点**を深掘りし、解決策を探す。", score: 'S' }, { text: "全ての側面、影響、可能性を俯瞰し、**広い視野**から解決策を探す。", score: 'M' }] },
+
+    // 軸 3：T軸 (Trigger Point) - モチベーションの着火点 (L/I)
+    { q: 9, text: "大きな買い物をするとき、決定打になるのは？", axis: 'T', options: [{ text: "性能や価格を綿密に比較し、最も理にかなっていると判断した時。", score: 'L' }, { text: "「これが欲しい！」という強い衝動や、直感的なひらめきが湧いた時。", score: 'I' }] },
+    { q: 10, text: "締切までの時間の使い方は？", axis: 'T', options: [{ text: "余裕を持って計画を立て、前倒しで少しずつ進めていく。", score: 'L' }, { text: "締切が迫り、焦りや興奮を感じた時に一気に集中力を高めて取り掛かる。", score: 'I' }] },
+    { q: 11, text: "習慣やルーティンは好きですか？", axis: 'T', options: [{ text: "好きである。決まった手順や規則がある方が、効率的で安心できる。", score: 'L' }, { text: "あまり好きではない。気分や状況に応じて、自由に柔軟に行動したい。", score: 'I' }] },
+    { q: 12, text: "誰かに何かを説得するとき、あなたが重視するのは？", axis: 'T', options: [{ text: "客観的なデータや論理的な根拠を提示し、納得させること。", score: 'L' }, { text: "相手の感情に訴えかけ、熱意やビジョンを共有すること。", score: 'I' }] },
+];
+
+// 診断結果データ (全8タイプ)
+const results = {
+    // R (充電型) - S (一点集中型) - L (計画始動型)
+    'RSL': {
+        name: '静かなる建築家', icon: '⚙️', mbti: 'INTJ',
+        summary: '内省（R）でエネルギーを充電し、緻密な計画（L）に基づき、一つの目標（S）を黙々と追求する建築家タイプです。',
+        energy: '誰にも邪魔されない環境での思考や読書で活力を得ます。外部の騒音や不必要な交流は、あなたのエネルギーを一気に削ぎます。',
+        action: '綿密な計画（L）を土台とし、目標達成のためには手段を選ばず、徹底的にコアな一点（S）を深掘りして完成させます。',
+        strengths: '論理的な分析力、目標遂行の確実性、内なる世界を深く掘り下げる探求心。',
+    },
+    // P (放出型) - S (一点集中型) - L (計画始動型)
+    'PSL': {
+        name: '社交的な職人', icon: '🔥', mbti: 'ESTJ',
+        summary: '外との交流（P）で力を得て、計画（L）という秩序の中で、専門的なスキル（S）を安定して磨き上げる職人タイプです。',
+        energy: '人と協働したり、教えたりすることでエネルギーが満たされます。しかし、集中するべき専門分野（S）から逸脱するとストレスを感じます。',
+        action: '長期的な計画（L）を立て、その枠組みの中で最高の専門性を発揮することに集中（S）します。結果を出すための現実的な行動が得意です。',
+        strengths: '高い専門性、責任感、計画に沿った安定した実行力、集団における建設的な指導力。',
+    },
+    // R (充電型) - M (同時並行型) - L (計画始動型)
+    'RML': {
+        name: 'マイペースな学者', icon: '🦉', mbti: 'INTJ/INTP',
+        summary: '内省（R）でエネルギーを充電し、計画（L）という秩序のもとで、複数の分野（M）を同時に探求することに喜びを感じる学者タイプです。',
+        energy: '知識の吸収や、独自の体系的な思考を行う静かな時間が必要です。感情論よりも合理性や論理性を重んじます。',
+        action: '緻密な計画（L）と論理的な判断が行動のトリガー。幅広い知識（M）を独自に結びつけ、体系化することで解決策を見出します。',
+        strengths: '知識の幅広さ、冷静な分析力、計画通りに物事を遂行する確実性、独自の視点。',
+    },
+    // P (放出型) - M (同時並行型) - L (計画始動型)
+    'PML': {
+        name: '万能なマネージャー', icon: '👑', mbti: 'ENTJ',
+        summary: '外向性（P）と広い視野（M）で周囲を統率し、計画（L）通りに全てを動かすことに長けたマネージャータイプです。',
+        energy: '集団の中心で指揮を執る時や、問題解決のために人と協力する時に最も活力が湧きます。',
+        action: '全体像を把握し（M）、目標達成のための戦略を練り（L）、人を巻き込んで推進力（P）を生み出します。タスク管理能力に優れます。',
+        strengths: '統率力、多才さ、効率性、複雑な状況を整理し計画する能力。',
+    },
+    // R (充電型) - S (一点集中型) - I (突発始動型)
+    'RSI': {
+        name: '孤高の探求者', icon: '🌌', mbti: 'INFP/ISFP',
+        summary: '内なる衝動（I）と直感に従い、一人（R）で深く（S）探求する、独自の真実を追求する探求者タイプです。',
+        energy: '内なる世界との対話や、深く集中できる芸術的な活動からエネルギーを得ます。人前では力を発揮しにくい傾向があります。',
+        action: '強いインスピレーション（I）や感情が湧いた時に、一気に深く集中（S）し、探求を始めます。計画性よりも直感的な動きを重視します。',
+        strengths: '強い集中力、直感的な洞察力、深い感受性、ブレない信念。',
+    },
+    // P (放出型) - S (一点集中型) - I (突発始動型)
+    'PSI': {
+        name: '短期決戦の狩人', icon: '🎯', mbti: 'ESTP/ESFP',
+        summary: '外的な刺激（P）と衝動（I）で集中力を最大化（S）し、一気に目標を達成する、短期決戦に強いハンタータイプです。',
+        energy: '刺激的なイベントや、競争的な状況で最高のパフォーマンスを発揮します。静的な環境では力が半減します。',
+        action: '締切や危機感（I）を感じた時に集中力（S）が一気に高まり、即座に行動に移します。計画よりもその場の状況に合わせた柔軟な対応が得意です。',
+        strengths: '瞬間的な集中力、大胆な行動力、状況適応能力、高い問題解決能力。',
+    },
+    // R (充電型) - M (同時並行型) - I (突発始動型)
+    'RMI': {
+        name: '自由なアーティスト', icon: '🎨', mbti: 'INFP/INTP',
+        summary: '内側（R）から湧き出る感情（I）やアイデアを、複数の分野（M）を使って表現する、自由な創造性を愛するアーティストタイプです。',
+        energy: '孤独な環境で、制限なく自由に発想を広げているときに最も活力を感じます。決まったルールや手順を嫌います。',
+        action: '感情や衝動（I）に任せて複数のアイデアを同時に進め（M）、その中の最高のものを形にします。計画よりも柔軟性と自由な発想を重視します。',
+        strengths: '創造性、感情の豊かさ、柔軟な思考力、独自の価値観。',
+    },
+    // P (放出型) - M (同時並行型) - I (突発始動型)
+    'PMI': {
+        name: '賑やかな指揮者', icon: '🚀', mbti: 'ENFP/ENTP',
+        summary: '周囲を巻き込み（P）、衝動的なエネルギー（I）を多方面（M）に拡散する、熱意と活気に満ちた指揮者タイプです。',
+        energy: '新しい人や文化に触れたり、自分の情熱を誰かと共有したりする時に、無限のエネルギーが湧いてきます。',
+        action: '強いひらめきや情熱（I）によって行動を開始し、そのエネルギーで複数のプロジェクト（M）を同時に動かします。計画よりも面白さを優先します。',
+        strengths: '拡散力、コミュニケーション能力、即座の行動力、ポジティブな影響力。',
+    },
+};
+
+// ====================================
+// 診断ロジック
+// ====================================
+
+let currentQuestionIndex = 0;
+let userAnswers = {}; // { E: [], F: [], T: [] }
+
+const startScreen = document.getElementById('start-screen');
+const questionScreen = document.getElementById('question-screen');
+const resultScreen = document.getElementById('result-screen');
+const startButton = document.getElementById('start-button');
+const questionTextElement = document.getElementById('question-text');
+const optionsContainer = document.getElementById('options-container');
+const progressBar = document.getElementById('progress-bar');
+const resetButton = document.getElementById('reset-button');
+const container = document.querySelector('.container');
+
+// 診断開始
+startButton.addEventListener('click', () => {
+    startScreen.classList.remove('active');
+    questionScreen.classList.add('active');
+    currentQuestionIndex = 0;
+    userAnswers = { E: [], F: [], T: [] }; // スコアをリセット
+    loadQuestion();
+});
+
+// 質問を画面に表示
+function loadQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+        showResult();
         return;
     }
 
-    // 2. 複利計算の実行と月次データの記録（計算は複利のみに固定）
-    let totalInvestment = initialAmount;
-    let totalPrincipal = initialAmount;
-    const monthlyRate = annualRate / 12;
-    const monthlyData = [];
-    const totalMonths = years * 12;
-
-    for (let month = 1; month <= totalMonths; month++) {
-        let monthlyInterest = 0;
-
-        // 毎月の積立
-        totalInvestment += monthlyContribution;
-        totalPrincipal += monthlyContribution;
-
-        // 複利計算
-        monthlyInterest = totalInvestment * monthlyRate;
-        totalInvestment += monthlyInterest;
-
-        monthlyData.push({
-            month: month,
-            total: totalInvestment,
-            interest: monthlyInterest,
-            principal: totalPrincipal 
-        });
-    }
-
-    // 3. 結果の計算と表示
-    const finalTotalBeforeTax = monthlyData[monthlyData.length - 1].total;
-    const finalPrincipal = monthlyData[monthlyData.length - 1].principal;
-    const finalInterestBeforeTax = finalTotalBeforeTax - finalPrincipal; // 税引前の利息
-
-    // 税金と税引後利益の計算
-    const totalTax = finalInterestBeforeTax * TAX_RATE;
-    const finalInterestAfterTax = finalInterestBeforeTax - totalTax;
-    const finalTotalAfterTax = finalPrincipal + finalInterestAfterTax;
-
-    // 日本円の形式にフォーマットする関数 (3桁区切り)
-    const formatCurrency = (number) => {
-        return Math.round(number).toLocaleString('ja-JP');
-    };
-
-    // 最終結果の表示
-    let resultHTML = `
-        <h3>計算結果 (複利)</h3>
-        
-        <p><strong>最終資産総額 (元本 + 利息):</strong> ${formatCurrency(finalTotalBeforeTax)} 円</p>
-    `;
+    const qData = questions[currentQuestionIndex];
+    questionTextElement.innerHTML = `Q${qData.q}. ${qData.text}`;
+    optionsContainer.innerHTML = '';
     
-    // 税金控除が「なし」（TAX_RATEが0）ではない場合のみ税引後を表示
-    if (TAX_RATE > 0) {
-         const taxRatePercent = (TAX_RATE * 100).toFixed(3); // 0.20315 -> 20.315
-         
-         resultHTML += `
-            <p style="font-size: 1.2em; color: #d9534f;">
-                <strong>最終資産総額 (税引後):</strong> ${formatCurrency(finalTotalAfterTax)} 円
-            </p>
+    // 選択肢ボタンの生成
+    qData.options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.classList.add('option-button');
+        button.innerHTML = option.text;
+        
+        // 選択肢クリック時の処理
+        button.addEventListener('click', () => {
+            recordAnswer(qData.axis, option.score);
+            // 選択肢をアニメーション
+            optionsContainer.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('selected'));
+            button.classList.add('selected');
+            
+            // 少し遅延させて次の質問へ（アニメーションを見せるため）
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 300); 
+        });
+        optionsContainer.appendChild(button);
+    });
+    
+    // プログレスバーの更新
+    const progress = (currentQuestionIndex / questions.length) * 100;
+    progressBar.style.width = `${progress}%`;
+}
 
-            <p><strong>（内訳）</strong></p>
-            <ul>
-                <li>元本（投資した金額の合計）: ${formatCurrency(finalPrincipal)} 円</li>
-                <li>利息（運用で増えた金額）： ${formatCurrency(finalInterestBeforeTax)} 円 (税引前)</li>
-                <li style="color: #d9534f;">利息（運用で増えた金額）： ${formatCurrency(finalInterestAfterTax)} 円 (税引後)</li>
-                <li>源泉徴収税額（${taxRatePercent}%）： ${formatCurrency(totalTax)} 円</li>
-            </ul>
-        `;
-    } else {
-        // 税金控除がない場合
-        resultHTML += `
-            <p><strong>（内訳）</strong></p>
-            <ul>
-                <li>元本（投資した金額の合計）: ${formatCurrency(finalPrincipal)} 円</li>
-                <li>利息（運用で増えた金額）： ${formatCurrency(finalInterestBeforeTax)} 円</li>
-            </ul>
-        `;
-    }
+// 回答の記録
+function recordAnswer(axis, score) {
+    userAnswers[axis].push(score);
+}
 
-    // 月次利息の可視化 (テーブル形式)
-    resultHTML += `
-        <h3 style="margin-top: 30px;">月次利息の推移（最初の3年間と最終年）</h3>
-        <table id="monthlyInterestTable">
-            <thead>
-                <tr>
-                    <th>経過月数</th>
-                    <th>月次利息</th>
-                    <th>資産総額</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${generateMonthlyTable(monthlyData, totalMonths, formatCurrency)}
-            </tbody>
-        </table>
-    `;
+// 結果の計算と表示
+function showResult() {
+    questionScreen.classList.remove('active');
+    resultScreen.classList.add('active');
+    progressBar.style.width = `100%`; // プログレスバーを完了
 
-    document.getElementById('result').innerHTML = resultHTML;
+    // 軸ごとの多数決スコアを計算
+    const finalE = getMajorityScore('E', 'R', 'P'); // 充電型(R) or 放出型(P)
+    const finalF = getMajorityScore('F', 'S', 'M'); // 一点集中型(S) or 同時並行型(M)
+    const finalT = getMajorityScore('T', 'L', 'I'); // 計画始動型(L) or 突発始動型(I)
+
+    const finalTypeKey = finalE + finalF + finalT; // 例: RML, PSI
+    const resultData = results[finalTypeKey];
+
+    // 結果画面の更新
+    document.getElementById('result-title').textContent = `【${resultData.name}】タイプ`;
+    document.getElementById('result-type-icon').textContent = resultData.icon;
+    document.getElementById('result-flow-summary').textContent = resultData.summary;
+    document.getElementById('result-energy-source').textContent = resultData.energy;
+    document.getElementById('result-action-style').textContent = resultData.action;
+    document.getElementById('result-strengths').textContent = `強み: ${resultData.strengths}`;
+    document.getElementById('result-mbti').textContent = `あなたのEFTはMBTIの【${resultData.mbti}】タイプと共通点が多いです。`;
+
+    // テーマカラーを適用
+    container.className = 'container'; // クラスをリセット
+    container.classList.add('type-' + finalTypeKey);
+}
+
+// 多数決で軸のスコアを決定
+function getMajorityScore(axis, scoreA, scoreB) {
+    const scores = userAnswers[axis];
+    const countA = scores.filter(s => s === scoreA).length;
+    const countB = scores.filter(s => s === scoreB).length;
+
+    // スコアが多い方を採用。同点の場合は、便宜上Aを採用（R, S, L）
+    return countA >= countB ? scoreA : scoreB;
+}
+
+// もう一度診断する
+resetButton.addEventListener('click', () => {
+    resultScreen.classList.remove('active');
+    startScreen.classList.add('active');
+    container.className = 'container'; // テーマカラーをリセット
 });
 
-// 月次データのテーブルHTMLを生成する関数 (最初の3年間に固定)
-function generateMonthlyTable(data, totalMonths, formatter) {
-    let tableRows = '';
-    
-    const initialMonthsToShow = Math.min(36, totalMonths);
-
-    // 最初の3年 (36ヶ月) のデータを追加
-    for (let i = 0; i < initialMonthsToShow; i++) {
-        const monthLabel = `${data[i].month}ヶ月`;
-        
-        tableRows += `
-            <tr>
-                <td>${monthLabel}</td>
-                <td>${formatter(data[i].interest)} 円</td>
-                <td>${formatter(data[i].total)} 円</td>
-            </tr>
-        `;
-    }
-
-    // データが3年以上ある場合、途中の区切りと最終年（12ヶ月）のデータを追加
-    if (totalMonths > 36) {
-        tableRows += `
-            <tr class="separator"><td colspan="3">... 途中経過省略 ...</td></tr>
-        `;
-        // 最終年のデータ (totalMonths - 12 から totalMonths - 1 まで)
-        for (let i = totalMonths - 12; i < totalMonths; i++) {
-             const monthLabel = `${data[i].month}ヶ月 (最終年)`;
-             
-             tableRows += `
-                <tr>
-                    <td>${monthLabel}</td>
-                    <td>${formatter(data[i].interest)} 円</td>
-                    <td>${formatter(data[i].total)} 円</td> 
-             </tr>
-            `;
-        }
-    }
-    return tableRows;
-}
+// 初期表示
+document.addEventListener('DOMContentLoaded', () => {
+    startScreen.classList.add('active');
+});

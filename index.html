@@ -3,50 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>利回りシミュレーション</title>
+    <title>エナジー・フロー・タイプ診断（EFT）</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="container">
-        <h1>💰 利回りシミュレーション</h1>
+        <header>
+            <h1>エナジー・フロー・タイプ診断（EFT）</h1>
+            <p class="subtitle">あなたのエネルギー源、集中力、モチベーションの着火点を知ろう。</p>
+        </header>
 
-        <div class="input-section">
-            <label for="initialAmount">元本（初期投資額）：</label>
-            <input type="number" id="initialAmount" value="1000000"> 円
+        <div id="start-screen" class="screen active">
+            <p>全12問の二者択一で、あなたの「エネルギー・フロー・タイプ」を診断します。</p>
+            <button id="start-button" class="main-button">診断を始める</button>
         </div>
 
-        <div class="input-section">
-            <label for="monthlyContribution">毎月の積立額：</label>
-            <input type="number" id="monthlyContribution" value="30000"> 円
-        </div>
-
-        <div class="input-section">
-            <label for="annualRate">想定利回り（年率）：</label>
-            <input type="number" id="annualRate" value="5" step="0.1"> %
-        </div>
-
-        <div class="input-section">
-            <label for="years">運用期間：</label>
-            <input type="number" id="years" value="20"> 年
-        </div>
-
-        <div class="input-section">
-            <label for="taxRateType">税金控除：</label>
-            <div>
-                <select id="taxRateType">
-                    <option value="0" selected>控除しない（なし）</option>
-                    <option value="0.20315">20.315% 控除</option>
-                    <option value="0.2828">28.28% 控除</option>
-                </select>
+        <div id="question-screen" class="screen">
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <p id="question-text" class="question-text"></p>
+            <div id="options-container" class="options-container">
                 </div>
         </div>
-        <button id="calculateBtn">シミュレーション実行</button>
 
-        <hr>
+        <div id="result-screen" class="screen">
+            <h2 id="result-title"></h2>
+            <div id="result-type-icon"></div>
+            <div id="result-content" class="result-content">
+                <h3 class="result-section-title">🧠 あなたのエネルギー・フロー</h3>
+                <p id="result-flow-summary"></p>
+                <h4 class="result-sub-title">🔋 エネルギー源</h4>
+                <p id="result-energy-source"></p>
+                <h4 class="result-sub-title">🧭 行動スタイル</h4>
+                <p id="result-action-style"></p>
+                
+                <h3 class="result-section-title">🌟 強みと弱点</h3>
+                <p id="result-strengths"></p>
 
-        <h2>📈 シミュレーション結果</h2>
-        <div id="result">
-            <p>ここに結果が表示されます。</p>
+                <h3 class="result-section-title mb-related">🤝 MBTIとの関連性</h3>
+                <p id="result-mbti"></p>
+            </div>
+            <button id="reset-button" class="main-button">もう一度診断する</button>
         </div>
     </div>
 

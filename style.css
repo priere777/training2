@@ -1,191 +1,190 @@
-/* 全体のリセットと基本設定 */
+/* ベースリセットとフォント */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
+    font-family: 'Arial', 'Hiragino Kaku Gothic ProN', sans-serif;
+    background-color: #f4f7f9; /* 明るい背景 */
     color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding: 20px 10px;
     min-height: 100vh;
-    margin: 0;
 }
 
-/* コンテナ (サイト全体を囲む箱) のスタイル */
 .container {
-    background-color: #ffffff;
-    padding: 30px 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    padding: 30px;
+    border-radius: 12px;
 }
 
-/* タイトルのスタイル */
-h1 {
+header h1 {
+    color: #4a69bd; /* メインカラー */
     text-align: center;
-    color: #007bff;
-    margin-bottom: 25px;
-    font-size: 1.6em;
-    border-bottom: 1px solid #e9ecef;
-    padding-bottom: 10px;
+    font-size: 2em;
+    margin-bottom: 5px;
 }
 
-h2 {
-    color: #28a745;
-    margin-top: 25px;
-    margin-bottom: 15px;
-    font-size: 1.4em;
-}
-
-/* 入力セクションのレイアウト */
-.input-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-/* ラベル (項目名) のスタイル */
-.input-section label {
-    font-weight: 600;
-    flex-basis: 50%;
-    font-size: 0.95em;
-}
-
-/* 入力フィールドのスタイル */
-input[type="number"] {
-    padding: 8px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    flex-basis: 40%;
-    text-align: right;
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
     font-size: 0.9em;
 }
 
-/* ドロップダウン (select) のスタイル */
-select {
-    padding: 8px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    flex-basis: 100%;
-    font-size: 0.9em;
+/* 画面切り替え */
+.screen {
+    display: none;
 }
-
-/* ドロップダウンの親コンテナの調整 */
-.input-section > div {
-    display: flex;
-    align-items: center;
-    flex-basis: 45%; 
-    justify-content: flex-end;
+.screen.active {
+    display: block;
 }
 
 /* ボタンのスタイル */
-#calculateBtn {
+.main-button {
+    display: block;
     width: 100%;
-    padding: 10px;
-    background-color: #007bff;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #4a69bd;
     color: white;
     border: none;
-    border-radius: 5px;
-    font-size: 1em;
+    border-radius: 8px;
+    font-size: 1.1em;
     cursor: pointer;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s;
+}
+.main-button:hover {
+    background-color: #385399;
 }
 
-#calculateBtn:hover {
-    background-color: #0056b3;
+/* 質問画面 */
+.question-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 25px;
+    text-align: left;
+    min-height: 50px; /* 質問文の最低高さを確保 */
 }
 
-/* 結果表示エリアのスタイル */
-#result {
-    margin-top: 15px;
-    padding: 15px;
-    background-color: #e9f7ef;
-    border: 1px solid #d4edda;
-    border-radius: 6px;
-    line-height: 1.4;
-    font-size: 0.95em;
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-/* 区切り線のスタイル */
-hr {
-    border: 0;
-    height: 1px;
-    background-color: #dee2e6;
-    margin: 25px 0;
+.option-button {
+    padding: 18px 20px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    color: #333;
+    cursor: pointer;
+    font-size: 1em;
+    text-align: left;
+    transition: all 0.2s;
 }
 
-/* テーブルのスタイル */
-#monthlyInterestTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    font-size: 0.85em;
+.option-button:hover {
+    border-color: #4a69bd;
+    background-color: #eef2f8;
 }
 
-#monthlyInterestTable th, #monthlyInterestTable td {
-    border: 1px solid #ddd;
-    padding: 6px;
-    text-align: right;
+/* 選択済みボタンのスタイル */
+.option-button.selected {
+    background-color: #4a69bd;
+    color: white;
+    border-color: #4a69bd;
+    box-shadow: 0 4px 6px rgba(74, 105, 189, 0.3);
 }
 
-#monthlyInterestTable th {
-    background-color: #f8f9fa;
+/* プログレスバー */
+.progress-bar-container {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    margin-bottom: 30px;
+    height: 10px;
+}
+.progress-bar {
+    height: 10px;
+    background-color: #4a69bd;
+    border-radius: 5px;
+    width: 0%;
+    transition: width 0.3s ease-in-out;
+}
+
+/* 結果画面 */
+#result-title {
     text-align: center;
-    color: #495057;
+    font-size: 2.2em;
+    margin-bottom: 15px;
 }
 
-#monthlyInterestTable tr:nth-child(even) {
-    background-color: #f2f2f2;
+#result-type-icon {
+    font-size: 3em;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-/* 途中の区切り線 */
-.separator td {
-    text-align: center !important;
-    background-color: #fff;
-    font-style: italic;
-    padding: 5px 0;
-    border: none !important;
+.result-content {
+    background-color: #f7f7f7;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 5px solid; /* テーマカラーで上書きされます */
+    margin-top: 20px;
 }
 
-/* ★モバイル対応（項目名のフォントサイズを調整） */
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-    .container {
-        padding: 20px 15px;
-        max-width: 100%;
-    }
-    
-    /* 入力セクションは横並びを維持 */
-    .input-section {
-        flex-direction: row; 
-        align-items: center;
-        justify-content: space-between;
-    }
-    
-    /* ラベル (項目名) のフォントサイズを小さくし、1行に収める */
-    .input-section label {
-        flex-basis: 40%; 
-        margin-bottom: 0;
-        margin-right: 5px;
-        font-size: 0.8em; /* ★修正: フォントサイズを小さく調整 */
-    }
-    
-    input[type="number"],
-    .input-section > div {
-        flex-basis: 55%; 
-        width: auto;
-    }
-    
-    /* タイトルとヘッダーの調整 */
-    h1 {
-        font-size: 1.4em;
-    }
-    h2 {
-        font-size: 1.2em;
-    }
+.result-section-title {
+    color: #4a69bd;
+    font-size: 1.3em;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 5px;
+    margin-top: 20px;
+    margin-bottom: 10px;
 }
+
+.result-sub-title {
+    font-size: 1.1em;
+    color: #6a6a6a;
+    margin-top: 15px;
+}
+
+/* ====================================
+   結果タイプごとのテーマカラー (JavaScriptで付与)
+   ==================================== */
+
+/* RSL: 静かなる建築家 (ネイビー/ディープブルー) */
+.type-RSL { border-color: #192a56; }
+.type-RSL #result-title { color: #192a56; }
+
+/* PSL: 社交的な職人 (テラコッタ/オレンジ) */
+.type-PSL { border-color: #e67e22; }
+.type-PSL #result-title { color: #e67e22; }
+
+/* RML: マイペースな学者 (モスグリーン/ボタニカル) */
+.type-RML { border-color: #27ae60; }
+.type-RML #result-title { color: #27ae60; }
+
+/* PML: 万能なマネージャー (ゴールド/サンシャインイエロー) */
+.type-PML { border-color: #f39c12; }
+.type-PML #result-title { color: #f39c12; }
+
+/* RSI: 孤高の探求者 (アメジスト/バイオレット) */
+.type-RSI { border-color: #8e44ad; }
+.type-RSI #result-title { color: #8e44ad; }
+
+/* PSI: 短期決戦の狩人 (ブリリアントレッド/スカーレット) */
+.type-PSI { border-color: #c0392b; }
+.type-PSI #result-title { color: #c0392b; }
+
+/* RMI: 自由なアーティスト (アクアブルー/エメラルド) */
+.type-RMI { border-color: #1abc9c; }
+.type-RMI #result-title { color: #1abc9c; }
+
+/* PMI: 賑やかな指揮者 (ホットピンク/マゼンタ) */
+.type-PMI { border-color: #e84393; }
+.type-PMI #result-title { color: #e84393; }
